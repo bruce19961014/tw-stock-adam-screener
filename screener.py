@@ -43,13 +43,14 @@ def get_screener_results():
                 box_high_20 = df['High'].iloc[-21:-1].max()
                 
                 # 條件邏輯
-                cond1 = curr['Close'] > box_high_20 # 突破20日高
+                cond1 = curr['Close'] > box_high_20 # 突破20日高點
                 cond2 = curr['MA5'] > curr['MA20'] > curr['MA60'] # 多頭排列
                 cond3 = curr['RSI'] > 60 # 動能轉強
-                cond4 = curr['Close'] >= df['BBU'].iloc[-1] * 0.98 # 觸碰上軌
-                cond5 = df['Volume'].tail(5).mean() > 1000000 # 五日均量>1000張
+                cond4 = curr['Close'] >= df['BBU'].iloc[-1] * 0.98 # 觸碰或突破布林上軌
+                cond5 = df['Volume'].tail(5).mean() > 1000000 # 五日均量 > 1000張
 
                 if cond1 and cond2 and cond3 and cond4 and cond5:
+                    # 停損建議：取前低或月線高者
                     stop_loss = max(prev['Low'], curr['MA20'])
                     all_results[pool_name].append({
                         "代碼": ticker.replace(".TW", ""),
@@ -60,7 +61,7 @@ def get_screener_results():
             except: continue
     return all_results, df.index[-1].strftime('%Y-%m-%d')
 
-# 生成 HTML (樣式沿用上次)
+# 生成 HTML 
 results, latest_day = get_screener_results()
 html = f"""
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
