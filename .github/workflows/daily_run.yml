@@ -33,9 +33,14 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 解決 origin 找不到的問題
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch origin main
-          git reset --hard origin main
+          git reset --hard origin/main
+          
+          # 重新生成網頁並強制推送
           python screener.py
           git add index.html
-          git commit -m "Update stock list" || exit 0
-          git push origin main --force
+          git commit -m "Update stock list: $(date +'%Y-%m-%d %H:%M')" || exit 0
+          git push origin HEAD:main --force
