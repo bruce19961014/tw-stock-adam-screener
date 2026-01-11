@@ -1,0 +1,25 @@
+name: ONDS Pro Update
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+jobs:
+  run-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install yfinance pandas
+      - name: Run Engine
+        run: python engine.py
+      - name: Commit and Push
+        run: |
+          git config --global user.name "ONDS Engine"
+          git config --global user.email "engine@onds.com"
+          git add data.json
+          git commit -m "Engine update: $(date)" || exit 0
+          git push
