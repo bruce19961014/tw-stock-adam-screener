@@ -3,7 +3,7 @@ name: Daily Stock Screener
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * 1-5'
+    - cron: '30 8 * * 1-5'
 
 jobs:
   build:
@@ -33,15 +33,9 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # 1. 強制讓本地與遠端同步
-          git fetch --all
-          git reset --hard origin/main
-          
-          # 2. 重新執行一次 Python，確保 index.html 是最新產生的
+          git fetch origin main
+          git reset --hard origin main
           python screener.py
-          
-          # 3. 強制推送到 GitHub
           git add index.html
-          git commit -m "Update stock list: $(date +'%Y-%m-%d %H:%M')" || exit 0
-          git push -f origin main
+          git commit -m "Update stock list" || exit 0
+          git push origin main --force
