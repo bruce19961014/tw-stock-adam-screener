@@ -33,7 +33,12 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # 先拉取最新狀態，如果衝突就直接以雲端為準，確保 git 狀態乾淨
+          git fetch origin main
+          git reset --hard origin main
+          # 重新執行一次 python 確保產生最新的 index.html (避免被 reset 掉)
+          python screener.py
+          # 強制推送到 main 分支，解決所有衝突問題
           git add index.html
           git commit -m "Update stock list" || exit 0
-          git pull --rebase origin main
-          git push origin main
+          git push origin main --force
